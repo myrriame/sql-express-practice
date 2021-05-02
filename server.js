@@ -31,28 +31,47 @@ app.get('/comments', async (req, res) => {
 
 
 // Create a POST endpoint that allows you to create a User
-
+app.post('/users', async (req, res) => {
+  const name = req.body.name;
+  const email = req.body.email;
+  await db.none(`INSERT INTO users (name, email) VALUES ($1, $2);`, [name, email])
+  res.send(`${name} was created`);
+})
 
 
 
 // Create a POST endpoint that allows you to create a Comment 
+app.post('/comments', async (req, res) => {
+  const post_id = req.body.post_id;
+  const user_id = req.body.user_id;
+  const comment = req.body.comment;
 
+  await db.any(`INSERT INTO comments (post_id, user_id, comment) VALUES ($1, $2, $3);`, [post_id, user_id, comment])
+  res.send('comment created');
+})
 
 // Create a PUT endpoint that allows you to update a User 
-app.put('/users/:id', async (req, res) => {
-  const id = req.params.id;
-  const name = req.params.name;
-  const email = req.params.email;
-  await db.none("UPDATE users SET name = $1, email = $2 WHERE id = $3", [name, email, id]).then((users) => {
+app.put('/users', async (req, res) => {
+  const id = req.body.id;
+  const name = req.body.name;
+  const email = req.body.email;
+  await db.none(`UPDATE users SET email = $1, name = $2 WHERE id = $3`, [email, name, id]);
 
 
+  res.send(`${name} has been updated`);
 
-    res.send(`${name} has been updated`);
-  });
 });
 
 // Create a PUT endpoint that allows you to update a Comment
+app.put('/comments', async (req, res) => {
 
+  const comment = req.body.comment;
+  const id = req.body.id;
+
+  await db.none(`UPDATE comments SET comment = $1 WHERE id = $2`, [comment, id]);
+
+  res.send('comment updated');
+})
 
 // Create a GET endpoint that allows you to retrieve a User's Comments
 app.get('/users/:comments', async (req, res) => {
